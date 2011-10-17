@@ -147,15 +147,27 @@ function path_admin_settings() {
     '#type' => 'checkbox',
     '#title' => t('Rename User Path'),
     '#default_value' => variable_get('path_user_rename', NULL),
-    '#description' => t('If checked, "user" will be replaced by the following term in user path.')
+    '#description' => t('If checked, "user" will be replaced by the following term in user path.'),
+    '#element_validate' => array('path_admin_form_validate_path_field'),
   );
 
   $form['path_user']['path_user_value'] = array(
     '#type' => 'textfield',
     '#title' => t('Replace "user" in user path by'),
     '#default_value' => variable_get('path_user_value', 'member'),
-    '#description' => t('This value will replace "user" in user path.')
+    '#description' => t('This value will replace "user" in user path.'),
+    '#element_validate' => array('path_admin_form_validate_path_field'),
   );
   
   return system_settings_form($form);
+}
+
+/**
+ * Validation for paths values.
+ */
+function path_admin_form_validate_path_field($element, &$form_state) {
+  // Force path replacement values to contain only lowercase letters, numbers, and underscores.
+  if (!preg_match('!^[a-z0-9_]+$!', $element['#value'])) {
+    form_error($element, t('Path replacement value must contain only lowercase letters, numbers, and underscores.'));
+  }
 }
