@@ -11,8 +11,8 @@ Installation
 ------------
 1. Install this module like any other Drupal module (place it in the
 modules directory for your site and enable it on the `admin/build/modules` page.
-2. Go to admin/config/user-interface/path-admin and configure how to override 
-admin paths.
+2. Go to admin/config/user-interface/rename-admin-paths and configure how to 
+override admin paths.
 
 
 Drupal 6
