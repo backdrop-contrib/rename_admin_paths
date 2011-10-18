@@ -8,11 +8,11 @@
 /**
  * Implements hook_install().
  */
-function path_admin_uninstall() {
+function rename_admin_paths_uninstall() {
 
   // Delete all variables defined by path admin
-  variable_del('path_admin_rename');
-  variable_del('path_admin_value');
-  variable_del('path_user_rename');
-  variable_del('path_user_value');
+  variable_del('rename_admin_path');
+  variable_del('rename_admin_path_value');
+  variable_del('rename_user_path');
+  variable_del('rename_user_path_value');
 }

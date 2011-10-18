@@ -10,19 +10,19 @@
 /**
  * Implements hook_help().
  */
-function path_admin_help($path, $arg) {
+function rename_admin_paths_help($path, $arg) {
 
   switch ($path) {
-    case 'admin/help#path_admin':
+    case 'admin/help#rename_admin_paths':
       $output = '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('The Path Admin module allows users to rename admin paths (/admin/..) to /something/... and (/user/..) to /something_else/...') . '</p>';
       $output .= '<h3>' . t('Uses') . '</h3>';
       $output .= '<dl><dt>' . t('Rename admin paths') . '</dt>';
-      $output .= '<dd>' . t('Choose how to rename admin paths by using <a href="@path_admin">Path Admin configuration</a>.', array('@path_admin' => url('admin/config/user-interface/path-admin'))) . '</dd>';
+      $output .= '<dd>' . t('Choose how to rename admin paths by using <a href="@rename_admin_paths">Path Admin configuration</a>.', array('@rename_admin_paths' => url('admin/config/user-interface/rename-admin-paths'))) . '</dd>';
       $output .= '</dl>';
       return $output;
 
-    case 'admin/config/user-interface/path-admin':
+    case 'admin/config/user-interface/rename-admin-paths':
       $output = '<p>' . t('Configure how to rename admin paths.') . '</p>';
       return $output;
   }
@@ -30,7 +30,7 @@ function path_admin_help($path, $arg) {
 /**
  * Implements hook_permission().
  */
-function path_admin_permission() {
+function rename_admin_paths_permission() {
   return array(
     'administer path admin' => array(
       'title' => t('Administer path admin'),
@@ -41,12 +41,12 @@ function path_admin_permission() {
 /**
  * Implements hook_menu().
  */
-function path_admin_menu() {
-  $items['admin/config/user-interface/path-admin'] = array(
+function rename_admin_paths_menu() {
+  $items['admin/config/user-interface/rename-admin-paths'] = array(
     'title' => t('Rename Admin Paths'),
     'description' => t('Configure how to rename admin paths.'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('path_admin_settings'),
+    'page arguments' => array('rename_admin_paths_settings'),
     'access arguments' => array('administer path admin'),
   );
 
@@ -56,25 +56,25 @@ function path_admin_menu() {
 /**
  * Implements hook_outbound_alter().
  */
-function path_admin_url_outbound_alter(&$path, &$options, $original_path) {
-  
+function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path) {
+
   // Admin path
-  if(variable_get('path_admin_rename', NULL)) {  
-    $path_admin_value = variable_get('path_admin_value', 'backend');
-    
+  if(variable_get('rename_admin_path', NULL)) {
+    $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
+
     // Replace admin in path
     if (preg_match('|^admin(/{0,1}.*)|', $path, $matches)) {
-      $path = urlencode($path_admin_value) . $matches[1];
+      $path = urlencode($rename_admin_path_value) . $matches[1];
     }
   }
-  
+
   // user path
-  if(variable_get('path_user_rename', NULL)) {  
-    $path_user_value = variable_get('path_user_value', 'member');
-    
+  if(variable_get('rename_user_path', NULL)) {  
+    $rename_user_path_value = variable_get('rename_user_path_value', 'member');
+
     // Replace user in path
     if (preg_match('|^user(/{0,1}.*)|', $path, $matches)) {
-      $path = urlencode($path_user_value) . $matches[1];
+      $path = urlencode($rename_admin_path_value) . $matches[1];
     }
   }
 }
@@ -82,14 +82,14 @@ function path_admin_url_outbound_alter(&$path, &$options, $original_path) {
 /**
  * Implements hook_inbound_alter().
  */
-function path_admin_url_inbound_alter(&$path, $original_path, $path_language) {
-  
+function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_language) {
+
   // Admin path
-  if(variable_get('path_admin_rename', NULL)) {  
-    $path_admin_value = variable_get('path_admin_value', 'backend');
+  if(variable_get('rename_admin_path', NULL)) {
+    $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
 
     // Get back default admin path 
-    if (preg_match('|^' . urlencode($path_admin_value) . '(/{0,1}.*)|', $path, $matches)) {
+    if (preg_match('|^' . urlencode($rename_admin_path_value) . '(/{0,1}.*)|', $path, $matches)) {
       $path = 'admin'. $matches[1];
     }
     // Get 404 for default admin path
@@ -97,13 +97,13 @@ function path_admin_url_inbound_alter(&$path, $original_path, $path_language) {
       $path = '404'. $matches[1];
     }
   }
-  
-  // User path
-  if(variable_get('path_user_rename', NULL)) {  
-    $path_user_value = variable_get('path_user_value', 'member');
-    
+
+  // user path
+  if(variable_get('rename_user_path', NULL)) {  
+    $rename_user_path_value = variable_get('rename_user_path_value', 'member');
+
     // Get back default user path 
-    if (preg_match('|^' . urlencode($path_user_value) . '(/{0,1}.*)|', $path, $matches)) {
+    if (preg_match('|^' . urlencode($rename_user_path_value) . '(/{0,1}.*)|', $path, $matches)) {
       $path = 'user'. $matches[1];
     }
     // Get 404 for default user path
@@ -116,56 +116,57 @@ function path_admin_url_inbound_alter(&$path, $original_path, $path_language) {
 /**
  * Implements hook_menu().
  */
-function path_admin_settings() {
+function rename_admin_paths_settings() {
   $form = array();
-  
-  $form['path_admin'] = array(
+
+  $form['rename_admin_path'] = array(
     '#type' => 'fieldset',
     '#title' => t('Rename Admin Path'),
   );
-  
-  $form['path_admin']['path_admin_rename'] = array(
+
+  $form['rename_admin_path']['rename_admin_path'] = array(
     '#type' => 'checkbox',
     '#title' => t('Rename Admin Path'),
-    '#default_value' => variable_get('path_admin_rename', NULL),
+    '#default_value' => variable_get('rename_admin_path', NULL),
     '#description' => t('If checked, "admin" will be replaced by the following term in admin path.')
   );
 
-  $form['path_admin']['path_admin_value'] = array(
+  $form['rename_admin_path']['rename_admin_path_value'] = array(
     '#type' => 'textfield',
     '#title' => t('Replace "admin" in admin path by'),
-    '#default_value' => variable_get('path_admin_value', 'backend'),
-    '#description' => t('This value will replace "admin" in admin path.')
+    '#default_value' => variable_get('rename_admin_path_value', 'backend'),
+    '#description' => t('This value will replace "admin" in admin path.'),
+    '#element_validate' => array('rename_admin_paths_form_validate_path_field'),
   );
-  
-  $form['path_user'] = array(
+
+  $form['rename_user_path'] = array(
     '#type' => 'fieldset',
     '#title' => t('Rename User Path'),
   );
-  
-  $form['path_user']['path_user_rename'] = array(
+
+  $form['rename_user_path']['rename_user_path'] = array(
     '#type' => 'checkbox',
     '#title' => t('Rename User Path'),
-    '#default_value' => variable_get('path_user_rename', NULL),
+    '#default_value' => variable_get('rename_user_path', NULL),
     '#description' => t('If checked, "user" will be replaced by the following term in user path.'),
-    '#element_validate' => array('path_admin_form_validate_path_field'),
+    '#element_validate' => array('rename_admin_paths_form_validate_path_field'),
   );
 
-  $form['path_user']['path_user_value'] = array(
+  $form['rename_user_path']['path_user_value'] = array(
     '#type' => 'textfield',
     '#title' => t('Replace "user" in user path by'),
-    '#default_value' => variable_get('path_user_value', 'member'),
+    '#default_value' => variable_get('rename_user_path_value', 'member'),
     '#description' => t('This value will replace "user" in user path.'),
-    '#element_validate' => array('path_admin_form_validate_path_field'),
+    '#element_validate' => array('rename_admin_paths_form_validate_path_field'),
   );
-  
+
   return system_settings_form($form);
 }
 
 /**
  * Validation for paths values.
  */
-function path_admin_form_validate_path_field($element, &$form_state) {
+function rename_admin_paths_form_validate_path_field($element, &$form_state) {
   // Force path replacement values to contain only lowercase letters, numbers, and underscores.
   if (!preg_match('!^[a-z0-9_]+$!', $element['#value'])) {
     form_error($element, t('Path replacement value must contain only lowercase letters, numbers, and underscores.'));
