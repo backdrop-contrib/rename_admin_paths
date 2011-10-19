@@ -74,7 +74,7 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
 
     // Replace user in path
     if (preg_match('|^user(/{0,1}.*)|', $path, $matches)) {
-      $path = urlencode($rename_admin_path_value) . $matches[1];
+      $path = urlencode($rename_user_path_value) . $matches[1];
     }
   }
 }
@@ -84,19 +84,28 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
  */
 function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_language) {
 
-  // Admin path
-  if(variable_get('rename_admin_path', NULL)) {
-    $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
 
-    // Get back default admin path 
-    if (preg_match('|^' . urlencode($rename_admin_path_value) . '(/{0,1}.*)|', $path, $matches)) {
-      $path = 'admin'. $matches[1];
+    // Admin path
+    if(variable_get('rename_admin_path', NULL)) {
+      $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
+
+      // Avoid 404 after overlay module is enabled
+      // This is not a good way, check $_SESSION['overlay_enable_redirect'] every time
+      if (!isset($_SESSION['overlay_enable_redirect']) || !$_SESSION['overlay_enable_redirect']) {
+
+          // Get back default admin path 
+          if (preg_match('|^' . urlencode($rename_admin_path_value) . '(/{0,1}.*)|', $path, $matches)) {
+            $path = 'admin'. $matches[1];
+          }
+
+      }
+
+      // Get 404 for default admin path
+      if (preg_match('|^admin(/{0,1}.*)|', $original_path, $matches)) {
+        $path = '404';
+      }
     }
-    // Get 404 for default admin path
-    if (preg_match('|^admin(/{0,1}.*)|', $original_path, $matches)) {
-      $path = '404'. $matches[1];
-    }
-  }
+
 
   // user path
   if(variable_get('rename_user_path', NULL)) {  
@@ -108,9 +117,29 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
     }
     // Get 404 for default user path
     if (preg_match('|^user(/{0,1}.*)|', $original_path, $matches)) {
-      $path = '404'. $matches[1];
+      $path = '404';
     }
   }
+}
+
+/**
+ * Implements hook_overlay_parent_initialize().
+ * Override administrative paths defined by overlay module
+ */
+function rename_admin_paths_overlay_parent_initialize() {
+  // Let the client side know which paths are administrative.
+  $paths = path_get_admin_paths();
+  foreach ($paths as &$type) {
+    $type = str_replace('<front>', variable_get('site_frontpage', 'node'), $type);
+    // Replace "admin" in administrative paths
+    $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
+    $type = str_replace('admin', urlencode($rename_admin_path_value), $type);
+    // Replace "user" in administrative paths
+    $rename_user_path_value = variable_get('rename_user_path_value', 'member');
+    $type = str_replace('user', urlencode($rename_user_path_value), $type);
+  }
+  // Override overlay paths
+  drupal_add_js(array('overlay' => array('paths' => $paths)), 'setting');
 }
 
 /**
