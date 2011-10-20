@@ -122,6 +122,24 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
   }
 }
 
+
+/**
+ * Implements hook_admin_paths_alter().
+ */
+function rename_admin_paths_admin_paths_alter(&$paths) {
+
+  foreach($paths as $path => $enable) {
+    // add renamed admin paths
+    $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
+    $paths[str_replace('admin', urlencode($rename_admin_path_value), $path)] = $enable;
+
+    // Replace "user" in administrative paths
+    $rename_user_path_value = variable_get('rename_user_path_value', 'member');
+    $paths[str_replace('user', urlencode($rename_user_path_value), $path)] = $enable;
+  }
+}
+
+
 /**
  * Implements hook_overlay_parent_initialize().
  * Override administrative paths defined by overlay module
@@ -131,12 +149,6 @@ function rename_admin_paths_overlay_parent_initialize() {
   $paths = path_get_admin_paths();
   foreach ($paths as &$type) {
     $type = str_replace('<front>', variable_get('site_frontpage', 'node'), $type);
-    // Replace "admin" in administrative paths
-    $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
-    $type = str_replace('admin', urlencode($rename_admin_path_value), $type);
-    // Replace "user" in administrative paths
-    $rename_user_path_value = variable_get('rename_user_path_value', 'member');
-    $type = str_replace('user', urlencode($rename_user_path_value), $type);
   }
   // Override overlay paths
   drupal_add_js(array('overlay' => array('paths' => $paths)), 'setting');
