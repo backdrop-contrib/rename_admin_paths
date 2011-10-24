@@ -97,7 +97,6 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
           if (preg_match('|^' . urlencode($rename_admin_path_value) . '(/{0,1}.*)|', $path, $matches)) {
             $path = 'admin'. $matches[1];
           }
-
       }
 
       // Get 404 for default admin path
@@ -128,14 +127,22 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
  */
 function rename_admin_paths_admin_paths_alter(&$paths) {
 
-  foreach($paths as $path => $enable) {
-    // add renamed admin paths
-    $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
-    $paths[str_replace('admin', urlencode($rename_admin_path_value), $path)] = $enable;
+  // Check if enable
+  if(variable_get('rename_admin_path', NULL) || variable_get('rename_admin_path', NULL)) {
+    foreach($paths as $path => $enable) {
 
-    // Replace "user" in administrative paths
-    $rename_user_path_value = variable_get('rename_user_path_value', 'member');
-    $paths[str_replace('user', urlencode($rename_user_path_value), $path)] = $enable;
+      // Add renamed admin paths
+      if(variable_get('rename_admin_path', NULL)) {
+        $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
+        $paths[str_replace('admin', urlencode($rename_admin_path_value), $path)] = $enable;
+      }
+
+      // Replace "user" in administrative paths
+      if(variable_get('rename_user_path', NULL)) {
+        $rename_user_path_value = variable_get('rename_user_path_value', 'member');
+        $paths[str_replace('user', urlencode($rename_user_path_value), $path)] = $enable;
+      }
+    }
   }
 }
 
@@ -145,13 +152,14 @@ function rename_admin_paths_admin_paths_alter(&$paths) {
  * Override administrative paths defined by overlay module
  */
 function rename_admin_paths_overlay_parent_initialize() {
-  // Let the client side know which paths are administrative.
-  $paths = path_get_admin_paths();
-  foreach ($paths as &$type) {
-    $type = str_replace('<front>', variable_get('site_frontpage', 'node'), $type);
+
+  // Check if enable
+  if(variable_get('rename_admin_path', NULL) || variable_get('rename_admin_path', NULL)) {
+
+    // Override overlay paths
+    $paths = path_get_admin_paths();
+    drupal_add_js(array('overlay' => array('paths' => $paths)), 'setting');
   }
-  // Override overlay paths
-  drupal_add_js(array('overlay' => array('paths' => $paths)), 'setting');
 }
 
 /**
