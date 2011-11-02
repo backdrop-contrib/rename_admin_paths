@@ -84,19 +84,13 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
  */
 function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_language) {
 
-
     // Admin path
     if(variable_get('rename_admin_path', NULL)) {
       $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
 
-      // Avoid 404 after overlay module is enabled
-      // This is not a good way, check $_SESSION['overlay_enable_redirect'] every time
-      if (!isset($_SESSION['overlay_enable_redirect']) || !$_SESSION['overlay_enable_redirect']) {
-
-          // Get back default admin path 
-          if (preg_match('|^' . urlencode($rename_admin_path_value) . '(/{0,1}.*)|', $path, $matches)) {
-            $path = 'admin'. $matches[1];
-          }
+      // Get back default admin path 
+      if (preg_match('|^' . urlencode($rename_admin_path_value) . '(/{0,1}.*)|', $path, $matches)) {
+        $path = 'admin'. $matches[1];
       }
 
       // Get 404 for default admin path
@@ -105,8 +99,7 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
       }
     }
 
-
-  // user path
+  // User path
   if(variable_get('rename_user_path', NULL)) {  
     $rename_user_path_value = variable_get('rename_user_path_value', 'member');
 
@@ -132,13 +125,13 @@ function rename_admin_paths_admin_paths_alter(&$paths) {
     foreach($paths as $path => $enable) {
 
       // Add renamed admin paths
-      if(variable_get('rename_admin_path', NULL)) {
+      if(variable_get('rename_admin_path', NULL) && variable_get('rename_admin_path', NULL)) {
         $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
         $paths[str_replace('admin', urlencode($rename_admin_path_value), $path)] = $enable;
       }
 
       // Replace "user" in administrative paths
-      if(variable_get('rename_user_path', NULL)) {
+      if(variable_get('rename_admin_path', NULL) && variable_get('rename_admin_path', NULL)) {
         $rename_user_path_value = variable_get('rename_user_path_value', 'member');
         $paths[str_replace('user', urlencode($rename_user_path_value), $path)] = $enable;
       }
