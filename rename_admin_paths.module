@@ -99,12 +99,22 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
       $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
 
       // Get back default admin path 
-      if (preg_match('|^' . urlencode($rename_admin_path_value) . '(/{0,1}.*)|i', $path, $matches)) {
+      if (preg_match('|^' . urlencode($rename_admin_path_value) . '$|i', $path, $matches)) {
         $path = 'admin'. $matches[1];
       }
 
+      // Get back default admin/* path 
+      if (preg_match('|^' . urlencode($rename_admin_path_value) . '/(.*)|i', $path, $matches)) {
+        $path = 'admin/'. $matches[1];
+      }
+
       // Get 404 for default admin path
-      if (preg_match('|^admin(/{0,1}.*)|i', $original_path, $matches)) {
+      if (preg_match('|^admin$|i', $original_path, $matches)) {
+        $path = '404';
+      }
+
+      // Get 404 for default admin/* path
+      if (preg_match('|^admin/(.*)|i', $original_path, $matches)) {
         $path = '404';
       }
     }
