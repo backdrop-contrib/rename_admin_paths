@@ -1,9 +1,9 @@
 <?php
-// $Id;
 
 /**
  * @file
  * Allows users to rename admin paths
+ *
  */
 
 
@@ -43,8 +43,8 @@ function rename_admin_paths_permission() {
  */
 function rename_admin_paths_menu() {
   $items['admin/config/user-interface/rename-admin-paths'] = array(
-    'title' => t('Rename Admin Paths'),
-    'description' => t('Configure how to rename admin paths.'),
+    'title' => 'Rename Admin Paths',
+    'description' => 'Configure how to rename admin paths.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('rename_admin_paths_settings'),
     'access arguments' => array('administer path admin'),
@@ -59,11 +59,11 @@ function rename_admin_paths_menu() {
 function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path) {
 
   // Admin path
-  if(variable_get('rename_admin_path', NULL)) {
+  if (variable_get('rename_admin_path', NULL)) {
     $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
 
     // Replace admin in path
-    if (preg_match('|^admin$|i', $path, $matches)) {
+    if (preg_match('|^admin$|i', $path)) {
       $path = urlencode($rename_admin_path_value);
     }
 
@@ -72,13 +72,13 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
       $path = urlencode($rename_admin_path_value) . '/' . $matches[1];
     }
   }
-  
+
   // user path
-  if(variable_get('rename_user_path', NULL)) {  
+  if (variable_get('rename_user_path', NULL)) {
     $rename_user_path_value = variable_get('rename_user_path_value', 'member');
 
     // Replace user in path
-    if (preg_match('|^user$|i', $path, $matches)) {
+    if (preg_match('|^user$|i', $path)) {
       $path = urlencode($rename_user_path_value);
     }
 
@@ -95,15 +95,15 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
 function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_language) {
 
     // Admin path
-    if(variable_get('rename_admin_path', NULL)) {
+    if (variable_get('rename_admin_path', NULL)) {
       $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
 
-      // Get back default admin path 
+      // Get back default admin path
       if (preg_match('|^' . urlencode($rename_admin_path_value) . '$|i', $path)) {
         $path = 'admin';
       }
 
-      // Get back default admin/* path 
+      // Get back default admin/* path
       if (preg_match('|^' . urlencode($rename_admin_path_value) . '/(.*)|i', $path, $matches)) {
         $path = 'admin/'. $matches[1];
       }
@@ -120,15 +120,15 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
     }
 
   // User path
-  if(variable_get('rename_user_path', NULL)) {  
+  if (variable_get('rename_user_path', NULL)) {  
     $rename_user_path_value = variable_get('rename_user_path_value', 'member');
 
-    /** 
+    /**
      * Fix module path bug
      * If there is a url alias for user/*, make sure that this url alias stay accessible
      * Issue #1331770 (http://drupal.org/node/1331770)
      */
-    if($path != $original_path && drupal_get_path_alias($path) == $original_path) {
+    if ($path != $original_path && drupal_get_path_alias($path) == $original_path) {
       $original_path = str_ireplace('user', 'people', $path);
     }
 
@@ -150,17 +150,17 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
 function rename_admin_paths_admin_paths_alter(&$paths) {
 
   // Check if enable
-  if(variable_get('rename_admin_path', NULL) || variable_get('rename_admin_path', NULL)) {
-    foreach($paths as $path => $enable) {
+  if (variable_get('rename_admin_path', NULL) || variable_get('rename_admin_path', NULL)) {
+    foreach ($paths as $path => $enable) {
 
       // Add renamed admin paths
-      if(variable_get('rename_admin_path', NULL) && variable_get('rename_admin_path', NULL)) {
+      if (variable_get('rename_admin_path', NULL) && variable_get('rename_admin_path', NULL)) {
         $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
         $paths[str_ireplace('admin', urlencode($rename_admin_path_value), $path)] = $enable;
       }
 
       // Replace "user" in administrative paths
-      if(variable_get('rename_admin_path', NULL) && variable_get('rename_admin_path', NULL)) {
+      if (variable_get('rename_admin_path', NULL) && variable_get('rename_admin_path', NULL)) {
         $rename_user_path_value = variable_get('rename_user_path_value', 'member');
         $paths[str_ireplace('user', urlencode($rename_user_path_value), $path)] = $enable;
       }
@@ -169,13 +169,12 @@ function rename_admin_paths_admin_paths_alter(&$paths) {
 }
 
 /**
- * Implements hook_overlay_parent_initialize().
- * Override administrative paths defined by overlay module
+ * Implements hook_overlay_parent_initialize(). Override administrative paths defined by overlay module
  */
 function rename_admin_paths_overlay_parent_initialize() {
 
   // Check if enable
-  if(variable_get('rename_admin_path', NULL) || variable_get('rename_admin_path', NULL)) {
+  if (variable_get('rename_admin_path', NULL) || variable_get('rename_admin_path', NULL)) {
 
     // Override overlay paths
     $paths = path_get_admin_paths();
@@ -184,7 +183,7 @@ function rename_admin_paths_overlay_parent_initialize() {
 }
 
 /**
- * Implements hook_menu().
+ * Settings form().
  */
 function rename_admin_paths_settings() {
   $form = array();
@@ -196,7 +195,7 @@ function rename_admin_paths_settings() {
 
   $form['rename_admin_path']['rename_admin_path'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Rename Admin Path'),
+    '#title' => t('Rename admin path'),
     '#default_value' => variable_get('rename_admin_path', NULL),
     '#description' => t('If checked, "admin" will be replaced by the following term in admin path.')
   );
@@ -211,12 +210,12 @@ function rename_admin_paths_settings() {
 
   $form['rename_user_path'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Rename User Path'),
+    '#title' => t('Rename user path'),
   );
 
   $form['rename_user_path']['rename_user_path'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Rename User Path'),
+    '#title' => t('Rename user path'),
     '#default_value' => variable_get('rename_user_path', NULL),
     '#description' => t('If checked, "user" will be replaced by the following term in user path.'),
     '#element_validate' => array('rename_admin_paths_form_validate_path_field'),
