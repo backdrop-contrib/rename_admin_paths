@@ -99,8 +99,8 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
       $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
 
       // Get back default admin path 
-      if (preg_match('|^' . urlencode($rename_admin_path_value) . '$|i', $path, $matches)) {
-        $path = 'admin'. $matches[1];
+      if (preg_match('|^' . urlencode($rename_admin_path_value) . '$|i', $path)) {
+        $path = 'admin';
       }
 
       // Get back default admin/* path 
