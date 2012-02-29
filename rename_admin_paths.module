@@ -3,7 +3,6 @@
 /**
  * @file
  * Allows users to rename admin paths
- *
  */
 
 
@@ -15,10 +14,10 @@ function rename_admin_paths_help($path, $arg) {
   switch ($path) {
     case 'admin/help#rename_admin_paths':
       $output = '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('The Path Admin module allows users to rename admin paths (/admin/..) to /something/... and (/user/..) to /something_else/...') . '</p>';
+      $output .= '<p>' . t('The path admin module allows users to rename admin paths (/admin/..) to /something/... and (/user/..) to /something_else/...') . '</p>';
       $output .= '<h3>' . t('Uses') . '</h3>';
       $output .= '<dl><dt>' . t('Rename admin paths') . '</dt>';
-      $output .= '<dd>' . t('Choose how to rename admin paths by using <a href="@rename_admin_paths">Path Admin configuration</a>.', array('@rename_admin_paths' => url('admin/config/user-interface/rename-admin-paths'))) . '</dd>';
+      $output .= '<dd>' . t('Choose how to rename admin paths by using: ') . l(t('Path admin configuration'), 'admin/config/user-interface/rename-admin-paths') . '</dd>';
       $output .= '</dl>';
       return $output;
 
@@ -120,7 +119,7 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
     }
 
   // User path
-  if (variable_get('rename_user_path', NULL)) {  
+  if (variable_get('rename_user_path', NULL)) {
     $rename_user_path_value = variable_get('rename_user_path_value', 'member');
 
     /**
@@ -132,7 +131,7 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
       $original_path = str_ireplace('user', 'people', $path);
     }
 
-    // Get back default user path 
+    // Get back default user path
     if (preg_match('|^' . urlencode($rename_user_path_value) . '(/{0,1}.*)|i', $path, $matches)) {
       $path = 'user'. $matches[1];
     }
@@ -169,7 +168,7 @@ function rename_admin_paths_admin_paths_alter(&$paths) {
 }
 
 /**
- * Implements hook_overlay_parent_initialize(). Override administrative paths defined by overlay module
+ * Implements hook_overlay_parent_initialize().
  */
 function rename_admin_paths_overlay_parent_initialize() {
 
@@ -190,7 +189,7 @@ function rename_admin_paths_settings() {
 
   $form['rename_admin_path'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Rename Admin Path'),
+    '#title' => t('Rename admin path'),
   );
 
   $form['rename_admin_path']['rename_admin_path'] = array(
