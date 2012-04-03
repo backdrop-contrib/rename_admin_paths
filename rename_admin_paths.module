@@ -153,17 +153,18 @@ function rename_admin_paths_admin_paths_alter(&$paths) {
     foreach ($paths as $path => $enable) {
 
       // Add renamed admin paths
-      if (variable_get('rename_admin_path', NULL) && variable_get('rename_admin_path', NULL)) {
+      if (variable_get('rename_admin_path', NULL)) {
         $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
-        $paths[str_ireplace('admin', urlencode($rename_admin_path_value), $path)] = $enable;
+        $paths[preg_replace('|^admin$|Ui', $rename_admin_path_value, $path)] = $enable;
+        $paths[preg_replace('|^admin/(.*)|Ui', $rename_admin_path_value . '/', $path)] = $enable;
       }
 
       // Replace "user" in administrative paths
-      if (variable_get('rename_admin_path', NULL) && variable_get('rename_admin_path', NULL)) {
+      if (variable_get('rename_user_path', NULL)) {
         $rename_user_path_value = variable_get('rename_user_path_value', 'member');
-        $paths[str_ireplace('user', urlencode($rename_user_path_value), $path)] = $enable;
+        $paths[preg_replace('|^user$|Ui', $rename_admin_path_value, $path)] = $enable;
+        $paths[preg_replace('|^user/(.*)|Ui', $rename_admin_path_value . '/', $path)] = $enable;
       }
-    }
   }
 }
 
