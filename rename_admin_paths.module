@@ -62,13 +62,8 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
     $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
 
     // Replace admin in path
-    if (preg_match('|^admin$|i', $path)) {
-      $path = urlencode($rename_admin_path_value);
-    }
-
-    // Replace admin/* in path
-    if (preg_match('|^admin/(.*)|i', $path, $matches)) {
-      $path = urlencode($rename_admin_path_value) . '/' . $matches[1];
+    if (preg_match('|^admin(?![^/])(.*)|', $path, $matches)) {
+      $path = urlencode($rename_admin_path_value) . $matches[1];
     }
   }
 
@@ -77,13 +72,8 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
     $rename_user_path_value = variable_get('rename_user_path_value', 'member');
 
     // Replace user in path
-    if (preg_match('|^user$|i', $path)) {
+    if (preg_match('|^user(?![^/])|', $path)) {
       $path = urlencode($rename_user_path_value);
-    }
-
-    // Replace user/* in path
-    if (preg_match('|^user/(.*)|i', $path, $matches)) {
-      $path = urlencode($rename_user_path_value) . '/' . $matches[1];
     }
   }
 }
@@ -93,30 +83,20 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
  */
 function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_language) {
 
-    // Admin path
-    if (variable_get('rename_admin_path', NULL)) {
-      $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
+  // Admin path
+  if (variable_get('rename_admin_path', NULL)) {
+    $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
 
-      // Get back default admin path
-      if (preg_match('|^' . urlencode($rename_admin_path_value) . '$|i', $path)) {
-        $path = 'admin';
-      }
-
-      // Get back default admin/* path
-      if (preg_match('|^' . urlencode($rename_admin_path_value) . '/(.*)|i', $path, $matches)) {
-        $path = 'admin/'. $matches[1];
-      }
-
-      // Get 404 for default admin path
-      if (preg_match('|^admin$|i', $original_path, $matches)) {
-        $path = '404';
-      }
-
-      // Get 404 for default admin/* path
-      if (preg_match('|^admin/(.*)|i', $original_path, $matches)) {
-        $path = '404';
-      }
+    // Get back default admin path
+    if (preg_match('|^' . urlencode($rename_admin_path_value) . '(?![^/])(.*)|', $path, $matches)) {
+      $path = 'admin' . $matches[1];
     }
+
+    // Get 404 for default admin path
+    if (preg_match('|^admin(?![^/])|', $original_path)) {
+      $path = '404';
+    }
+  }
 
   // User path
   if (variable_get('rename_user_path', NULL)) {
@@ -132,12 +112,12 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
     }
 
     // Get back default user path
-    if (preg_match('|^' . urlencode($rename_user_path_value) . '(/{0,1}.*)|i', $path, $matches)) {
+    if (preg_match('|^' . urlencode($rename_user_path_value) . '(?![^/])|', $path)) {
       $path = 'user'. $matches[1];
     }
 
     // Get 404 for default user path
-    if (preg_match('|^user(/{0,1}.*)|i', $original_path, $matches)) {
+    if (preg_match('|^user(?![^/])|', $original_path)) {
       $path = '404';
     }
   }
@@ -155,16 +135,17 @@ function rename_admin_paths_admin_paths_alter(&$paths) {
       // Add renamed admin paths
       if (variable_get('rename_admin_path', NULL)) {
         $rename_admin_path_value = variable_get('rename_admin_path_value', 'backend');
-        $paths[preg_replace('|^admin$|Ui', $rename_admin_path_value, $path)] = $enable;
-        $paths[preg_replace('|^admin/(.*)|Ui', $rename_admin_path_value . '/', $path)] = $enable;
+        $renamed_path = preg_replace('|^admin(?![^/])|', $rename_admin_path_value, $path);
+        $paths[$renamed_path] = $enable;
       }
 
       // Replace "user" in administrative paths
       if (variable_get('rename_user_path', NULL)) {
         $rename_user_path_value = variable_get('rename_user_path_value', 'member');
-        $paths[preg_replace('|^user$|Ui', $rename_admin_path_value, $path)] = $enable;
-        $paths[preg_replace('|^user/(.*)|Ui', $rename_admin_path_value . '/', $path)] = $enable;
+        $renamed_path = preg_replace('|^user(?![^/])|', $rename_admin_path_value, $path);
+        $paths[$renamed_path] = $enable;
       }
+    }
   }
 }
 
@@ -229,6 +210,8 @@ function rename_admin_paths_settings() {
     '#element_validate' => array('rename_admin_paths_form_validate_path_field'),
   );
 
+  $form['#submit'][] = 'rename_admin_paths_settings_submit';
+
   return system_settings_form($form);
 }
 
@@ -239,5 +222,15 @@ function rename_admin_paths_form_validate_path_field($element, &$form_state) {
   // Force path replacement values to contain only lowercase letters, numbers, and underscores.
   if (!preg_match('!^[a-z0-9_]+$!', $element['#value'])) {
     form_error($element, t('Path replacement value must contain only lowercase letters, numbers, and underscores.'));
+  }
+}
+
+/**
+ * Settings form submit.
+ */
+function rename_admin_paths_settings_submit() {
+  // Flush admin menu
+  if(function_exists('admin_menu_flush_caches')) {
+    admin_menu_flush_caches();
   }
 }
