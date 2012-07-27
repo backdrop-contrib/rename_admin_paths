@@ -72,8 +72,8 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
     $rename_user_path_value = variable_get('rename_user_path_value', 'member');
 
     // Replace user in path
-    if (preg_match('|^user(?![^/])|', $path)) {
-      $path = urlencode($rename_user_path_value);
+    if (preg_match('|^user(?![^/])(.*)|', $path, $matches)) {
+      $path = urlencode($rename_user_path_value) . $matches[1];
     }
   }
 }
@@ -112,7 +112,7 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
     }
 
     // Get back default user path
-    if (preg_match('|^' . urlencode($rename_user_path_value) . '(?![^/])|', $path)) {
+    if (preg_match('|^' . urlencode($rename_user_path_value) . '(?![^/])(.*)|', $path, $matches)) {
       $path = 'user'. $matches[1];
     }
 
