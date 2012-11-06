@@ -82,11 +82,13 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
  * Implements hook_inbound_alter().
  */
 function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_language) {
+  static $once = FALSE;
 
-  // Prevent the second call by PURL module (@see http://drupal.org/node/1703242)
-  if (module_exists('purl') && purl_inited()) {
+  // Prevent the second call by module that invokes drupal_path_initialize(). (@see http://drupal.org/node/1703242)
+  if($once) {
     return;
   }
+  $once = TRUE;
 
   // Admin path
   if (variable_get('rename_admin_path', NULL)) {
