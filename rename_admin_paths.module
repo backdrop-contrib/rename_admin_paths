@@ -100,7 +100,7 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
     }
 
     // Get 404 for default admin path
-    if (preg_match('|^admin(?![^/])|', $original_path)) {
+    if (preg_match('|^admin(?![^/])|i', $original_path)) {
       $path = '404';
     }
   }
@@ -124,7 +124,7 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
     }
 
     // Get 404 for default user path
-    if (preg_match('|^user(?![^/])|', $original_path)) {
+    if (preg_match('|^user(?![^/])|i', $original_path)) {
       $path = '404';
     }
   }
@@ -227,7 +227,7 @@ function rename_admin_paths_settings() {
  */
 function rename_admin_paths_form_validate_path_field($element, &$form_state) {
   // Force path replacement values to contain only lowercase letters, numbers, and underscores.
-  if (!preg_match('!^[a-z0-9_]+$!', $element['#value'])) {
+  if (!preg_match('!^[a-z0-9_]+$!i', $element['#value'])) {
     form_error($element, t('Path replacement value must contain only lowercase letters, numbers, and underscores.'));
   }
 }
