@@ -86,7 +86,7 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
 
     if (!empty($options['query']['destination'])) {
       // Replace user in the destination.
-      if (preg_match('/^admin(?:(?![^\/])|(?!(?!\%2F)))(.*)/', $options['query']['destination'], $matches)) {
+      if (preg_match('/^user(?:(?![^\/])|(?!(?!\%2F)))(.*)/', $options['query']['destination'], $matches)) {
         $options['query']['destination'] = urlencode($rename_user_path_value) . $matches[1];
       }
     }
