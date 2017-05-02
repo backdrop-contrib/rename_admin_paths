@@ -100,7 +100,7 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
   static $once = FALSE;
 
   // Prevent the second call by module that invokes drupal_path_initialize(). (@see http://drupal.org/node/1703242)
-  if($once) {
+  if ($once) {
     return;
   }
   $once = TRUE;
@@ -135,7 +135,7 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
 
     // Get back default user path
     if (preg_match('|^' . urlencode($rename_user_path_value) . '(?![^/])(.*)|', $path, $matches)) {
-      $path = 'user'. $matches[1];
+      $path = 'user' . $matches[1];
     }
 
     // Get 404 for default user path
@@ -252,7 +252,7 @@ function rename_admin_paths_form_validate_path_field($element, &$form_state) {
  */
 function rename_admin_paths_settings_submit() {
   // Flush admin menu
-  if(function_exists('admin_menu_flush_caches')) {
+  if (function_exists('admin_menu_flush_caches')) {
     admin_menu_flush_caches();
   }
 }
