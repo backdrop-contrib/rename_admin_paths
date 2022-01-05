@@ -6,13 +6,18 @@
  */
 
 /**
- * Implements hook_install().
+ * Move path settings from variable to config.
  */
-function rename_admin_paths_uninstall() {
-
-  // Delete all variables defined by path admin
-  variable_del('rename_admin_path');
-  variable_del('rename_admin_path_value');
-  variable_del('rename_user_path');
-  variable_del('rename_user_path_value');
+function rename_admin_paths_update_1000() {
+  $config = config('rename_admin_paths.settings');
+  $config->set('rename_admin_path', update_variable_get('rename_admin_path', 0));
+  $config->set('rename_admin_path_value', update_variable_get('rename_admin_path_value', 'backend'));
+  $config->set('rename_user_path', update_variable_get('rename_user_path', 0));
+  $config->set('rename_user_path_value', update_variable_get('rename_user_path_value', 'member'));
+  $config->save();
+  // Delete obsolete variables.
+  update_variable_del('rename_admin_path');
+  update_variable_del('rename_admin_path_value');
+  update_variable_del('rename_user_path');
+  update_variable_del('rename_user_path_value');
 }

@@ -1,0 +1,7 @@
+{
+    "_config_name": "rename_admin_paths.settings",
+    "rename_admin_path": 0,
+    "rename_admin_path_value": "backend",
+    "rename_user_path": 0,
+    "rename_user_path_value": "member"
+}

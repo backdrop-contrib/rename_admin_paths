@@ -1,6 +1,7 @@
 ; $Id;
 name = Rename Admin Paths
 description = Rename admin path /admin/.. and /user/.. to /something/..
-core = 7.x
+backdrop = 1.x
+type = module
 package = Administration
 configure = admin/config/user-interface/rename-admin-paths
