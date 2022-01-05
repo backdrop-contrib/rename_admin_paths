@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Allows users to rename admin paths
+ * Allows users to rename admin paths.
  */
 
 /**
@@ -36,29 +36,29 @@ function rename_admin_paths_menu() {
 function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path) {
   $config = config('rename_admin_paths.settings');
 
-  // Admin path
+  // Admin path.
   if ($config->get('rename_admin_path')) {
     $rename_admin_path_value = $config->get('rename_admin_path_value');
 
-    // Replace admin in path
+    // Replace admin in path.
     if (preg_match('|^admin(?![^/])(.*)|', $path, $matches)) {
       $path = urlencode($rename_admin_path_value) . $matches[1];
     }
 
     if (!empty($options['query']['destination'])) {
-      // Replace admin in the destination. Take care of the possible presence of %2F,
-      // which represents the forward slash (/).
+      // Replace admin in the destination. Take care of the possible presence
+      // of %2F, which represents the forward slash (/).
       if (preg_match('/^admin(?:(?![^\/])|(?!(?!\%2F)))(.*)/', $options['query']['destination'], $matches)) {
         $options['query']['destination'] = urlencode($rename_admin_path_value) . $matches[1];
       }
     }
   }
 
-  // user path
+  // Now user path.
   if ($config->get('rename_user_path')) {
     $rename_user_path_value = $config->get('rename_user_path_value');
 
-    // Replace user in path
+    // Replace user in path.
     if (preg_match('|^user(?![^/])(.*)|', $path, $matches)) {
       $path = urlencode($rename_user_path_value) . $matches[1];
     }
@@ -78,47 +78,46 @@ function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path
 function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_language) {
   static $once = FALSE;
 
-  // Prevent the second call by module that invokes backdrop_path_initialize(). (@see http://drupal.org/node/1703242)
+  // Prevent the second call by module that invokes backdrop_path_initialize().
+  // @see http://drupal.org/node/1703242
   if ($once) {
     return;
   }
   $once = TRUE;
   $config = config('rename_admin_paths.settings');
 
-  // Admin path
+  // Admin path.
   if ($config->get('rename_admin_path')) {
     $rename_admin_path_value = $config->get('rename_admin_path_value');
 
-    // Get back default admin path
+    // Get back default admin path.
     if (preg_match('|^' . urlencode($rename_admin_path_value) . '(?![^/])(.*)|', $path, $matches)) {
       $path = 'admin' . $matches[1];
     }
 
-    // Get 404 for default admin path
+    // Get 404 for default admin path.
     if (preg_match('|^admin(?![^/])|i', $original_path)) {
       $path = '404';
     }
   }
 
-  // User path
+  // User path.
   if ($config->get('rename_user_path')) {
     $rename_user_path_value = $config->get('rename_user_path_value');
 
-    /**
-     * Fix module path bug
-     * If there is a url alias for user/*, make sure that this url alias stay accessible
-     * Issue #1331770 (http://drupal.org/node/1331770)
-     */
+    // If there is a url alias for user/*, make sure that this url alias stays
+    // accessible.
+    // @see http://drupal.org/node/1331770
     if ($path != $original_path && backdrop_get_path_alias($path) == $original_path) {
       $original_path = str_ireplace('user', 'people', $path);
     }
 
-    // Get back default user path
+    // Get back default user path.
     if (preg_match('|^' . urlencode($rename_user_path_value) . '(?![^/])(.*)|', $path, $matches)) {
       $path = 'user' . $matches[1];
     }
 
-    // Get 404 for default user path
+    // Get 404 for default user path.
     if (preg_match('|^user(?![^/])|i', $original_path)) {
       $path = '404';
     }
@@ -135,14 +134,14 @@ function rename_admin_paths_admin_paths_alter(&$paths) {
   if ($config->get('rename_admin_path') || $config->get('rename_admin_path')) {
     foreach ($paths as $path => $enable) {
 
-      // Add renamed admin paths
+      // Add renamed admin paths.
       if ($config->get('rename_admin_path')) {
         $rename_admin_path_value = $config->get('rename_admin_path_value');
         $renamed_path = preg_replace('|^admin(?![^/])|', $rename_admin_path_value, $path);
         $paths[$renamed_path] = $enable;
       }
 
-      // Replace "user" in administrative paths
+      // Replace "user" in administrative paths.
       if ($config->get('rename_user_path')) {
         $rename_user_path_value = $config->get('rename_user_path_value');
         $renamed_path = preg_replace('|^user(?![^/])|', $rename_user_path_value, $path);
@@ -212,7 +211,8 @@ function rename_admin_paths_settings() {
  * Validation for paths values.
  */
 function rename_admin_paths_form_validate_path_field($element, &$form_state) {
-  // Force path replacement values to contain only lowercase letters, numbers, and underscores.
+  // Force path replacement values to contain only lowercase letters, numbers,
+  // and underscores.
   if (!preg_match('!^[a-z0-9_]+$!i', $element['#value'])) {
     form_error($element, t('Path replacement value must contain only lowercase letters, numbers, and underscores.'));
   }
@@ -222,7 +222,7 @@ function rename_admin_paths_form_validate_path_field($element, &$form_state) {
  * Settings form submit.
  */
 function rename_admin_paths_settings_submit() {
-  // Flush admin menu
+  // Flush admin menu.
   if (module_exists('admin_bar')) {
     cache('admin_bar')->flush();
   }
