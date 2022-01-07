@@ -10,6 +10,10 @@ This module allows you to:
 
 It can be effective against registration spam bots or malicious people.
 
+Although this module only obfuscates the paths, this may already be a big
+ help to get rid of those bots trying to probe passwords on /user/login or
+ register spam accounts on /user/register. They get a "404 not found" then.
+
 ## Installation
 
 Install this module using the official
