@@ -34,6 +34,9 @@ function rename_admin_paths_menu() {
  * Implements hook_outbound_alter().
  */
 function rename_admin_paths_url_outbound_alter(&$path, &$options, $original_path) {
+  if (empty($path)) {
+    return;
+  }
   $config = config('rename_admin_paths.settings');
 
   // Admin path.
