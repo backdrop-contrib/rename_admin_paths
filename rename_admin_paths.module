@@ -87,6 +87,11 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
     return;
   }
   $once = TRUE;
+
+  // @see https://www.drupal.org/sa-contrib-2022-033
+  require_once BACKDROP_ROOT . '/core/includes/transliteration.inc';
+  $normalized_path = transliteration_get($original_path, '');
+
   $config = config('rename_admin_paths.settings');
 
   // Admin path.
@@ -99,7 +104,7 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
     }
 
     // Get 404 for default admin path.
-    if (preg_match('|^admin(?![^/])|i', $original_path)) {
+    if (preg_match('|^admin(?![^/])|i', $normalized_path)) {
       $path = '404';
     }
   }
@@ -116,12 +121,12 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
     }
 
     // Get back default user path.
-    if (preg_match('|^' . urlencode($rename_user_path_value) . '(?![^/])(.*)|', $path, $matches)) {
+    if (preg_match('|^' . urlencode($rename_user_path_value) . '(?![^/])(.*)|i', $path, $matches)) {
       $path = 'user' . $matches[1];
     }
 
     // Get 404 for default user path.
-    if (preg_match('|^user(?![^/])|i', $original_path)) {
+    if (preg_match('|^user(?![^/])|i', $normalized_path)) {
       $path = '404';
     }
   }
