@@ -90,7 +90,7 @@ function rename_admin_paths_url_inbound_alter(&$path, $original_path, $path_lang
 
   // @see https://www.drupal.org/sa-contrib-2022-033
   require_once BACKDROP_ROOT . '/core/includes/transliteration.inc';
-  $normalized_path = transliteration_get($original_path, '');
+  $normalized_path = transliteration_get($original_path, '', 'en');
 
   $config = config('rename_admin_paths.settings');
 
