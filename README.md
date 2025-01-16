@@ -24,6 +24,10 @@ Install this module using the official
 Bugs and Feature requests should be reported in the
  [Issue Queue](https://github.com/backdrop-contrib/rename_admin_paths/issues.)
 
+## Known issues
+
+This module's not compatible with [Simplenews](https://backdropcms.org/project/simplenews).
+
 ## Current Maintainers
 
 - [Indigoxela](https://github.com/indigoxela)
